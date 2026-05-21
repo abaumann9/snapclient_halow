@@ -1,0 +1,18 @@
+menu "Status LED"
+
+	config STATUS_LED_ENABLED
+		bool "Enable WS2812B status LED"
+		default y if ESP32_S3_XIAO_AUDIO_HAT_BOARD
+		default n
+		help
+			Enable a WS2812B addressable LED for status indication.
+
+	config STATUS_LED_GPIO
+		int "Status LED GPIO number"
+		depends on STATUS_LED_ENABLED
+		default 10 if ESP32_S3_XIAO_AUDIO_HAT_BOARD
+		default -1
+		help
+			GPIO pin connected to the WS2812B data line.
+
+endmenu

@@ -29,7 +29,11 @@
 #include "eth_interface.h"
 #endif
 
+#if CONFIG_SNAPCLIENT_USE_HALOW
+#include "halow_interface.h"
+#else
 #include "wifi_interface.h"
+#endif
 
 static const char *TAG = "NET_IF";
 
@@ -74,9 +78,15 @@ bool network_if_get_ip(esp_netif_ip_info_t *ip) {
   }
 #endif
 
+#if CONFIG_SNAPCLIENT_USE_HALOW
+  if (halow_get_ip(ip) == true) {
+    return true;
+  }
+#else
   if (wifi_get_ip(ip) == true) {
     return true;
   }
+#endif
 
   return false;
 }
@@ -90,5 +100,9 @@ void network_if_init(void) {
   eth_start();
 #endif
 
+#if CONFIG_SNAPCLIENT_USE_HALOW
+  halow_start();
+#else
   wifi_start();
+#endif
 }

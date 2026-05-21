@@ -18,6 +18,10 @@ menu "Audio Board"
 	        Select an audio board to use with the ESP-ADF
 	config AUDIO_BOARD_CUSTOM
 	    bool "Custom audio board"
+	config ESP32_S3_XIAO_AUDIO_HAT_BOARD
+	    bool "ESP32-S3 XIAO + Audio HAT (PCM5102A)"
+	    help
+	        Seeed Studio ESP32-S3 XIAO with PCM5102A audio HAT.
 	config ESP_LYRAT_V4_3_BOARD
 	    bool "ESP32-Lyrat V4.3"
 	config ESP_LYRAT_V4_2_BOARD

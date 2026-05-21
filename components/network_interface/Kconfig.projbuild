@@ -249,7 +249,26 @@ menu "Snapclient Ethernet Configuration"
 endmenu
 
 
-menu "Wifi Configuration"
+choice SNAPCLIENT_WIFI_MODE
+    prompt "Wireless mode"
+    default SNAPCLIENT_WIFI_24GHZ
+    help
+        Select wireless connectivity: standard 2.4 GHz Wi-Fi or Wi-Fi HaLow (802.11ah).
+
+    config SNAPCLIENT_WIFI_24GHZ
+        bool "Standard 2.4 GHz Wi-Fi"
+
+    config SNAPCLIENT_USE_HALOW
+        bool "Wi-Fi HaLow (802.11ah)"
+        help
+            Use a MorseMicro HaLow transceiver instead of standard Wi-Fi.
+            Supports MM6108 and MM8108 chip variants.
+            Requires the morsemicro/halow component from the ESP component registry.
+endchoice
+
+menu "Wi-Fi Configuration"
+    depends on SNAPCLIENT_WIFI_24GHZ
+
     config ENABLE_WIFI_PROVISIONING
         bool "enable WiFi provisioning"
         default n
@@ -269,7 +288,7 @@ menu "Wifi Configuration"
         depends on !ENABLE_WIFI_PROVISIONING
         help
             WiFi password (WPA or WPA2) for the example to use.
-    
+
     choice WIFI_MIN_AUTHTYPE
         prompt "Authentication mode"
         default WIFI_AUTH_WPA2_WPA3_PSK
@@ -305,4 +324,40 @@ menu "Wifi Configuration"
         help
             Set the Maximum retry to avoid station reconnecting to the AP unlimited when the AP is really inexistent.
             Set to 0 if unlimited reconnections are preferred.
+endmenu
+
+menu "Wi-Fi HaLow Configuration"
+    depends on SNAPCLIENT_USE_HALOW
+
+    config ENABLE_HALOW_PROVISIONING
+        bool "Enable HaLow SoftAP provisioning"
+        default n
+        help
+            Run the ESP wifi_provisioning manager over a 2.4 GHz SoftAP on
+            first boot so the user can hand over SSID + SAE passphrase using
+            the "ESP SoftAP Provisioning" phone app. Credentials are stored
+            in NVS and reused on subsequent boots.
+
+    config HALOW_PROV_POP
+        string "Provisioning Proof of Possession"
+        depends on ENABLE_HALOW_PROVISIONING
+        default "abcd1234"
+        help
+            Proof-of-Possession string used by the phone app during the
+            secure session handshake.
+
+    config HALOW_SSID
+        string "HaLow SSID"
+        depends on !ENABLE_HALOW_PROVISIONING
+        default "MorseMicro"
+        help
+            SSID of the Wi-Fi HaLow access point to connect to.
+
+    config HALOW_PASSWORD
+        string "HaLow Password"
+        depends on !ENABLE_HALOW_PROVISIONING
+        default "12345678"
+        help
+            SAE passphrase for the Wi-Fi HaLow access point.
+            Leave empty for open networks.
 endmenu

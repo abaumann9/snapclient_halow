@@ -36,6 +36,7 @@
 #include "driver/i2s_std.h"
 #include "player.h"
 #include "snapcast.h"
+#include "status_led.h"
 
 #define USE_SAMPLE_INSERTION CONFIG_USE_SAMPLE_INSERTION
 
@@ -1719,6 +1720,7 @@ static void player_task(void *pvParameters) {
           age = (int64_t)timer_val - (-age);
 
           initialSync = 1;
+          status_led_set_state(STATUS_LED_OFF);
 
           // TODO: use a timer to un-mute non blocking
           vTaskDelay(pdMS_TO_TICKS(2));
@@ -1742,6 +1744,8 @@ static void player_task(void *pvParameters) {
           my_gptimer_stop(gptimer);
           
           int msgWaiting = uxQueueMessagesWaiting(pcmChkQHdl);
+
+          status_led_set_state(STATUS_LED_RESYNCING);
 
           ESP_LOGW(TAG,
                    "RESYNCING HARD 1: age %lldus, latency %lldus, free %d, "
@@ -2013,6 +2017,8 @@ static void player_task(void *pvParameters) {
             wifi_ap_record_t ap;
             esp_wifi_sta_get_ap_info(&ap);
 
+            status_led_set_state(STATUS_LED_RESYNCING);
+
             ESP_LOGW(TAG,
                      "RESYNCING HARD 2: age %lldus, latency %lldus, free "
                      "%d, largest block %d, %d, rssi: %d",
@@ -2138,6 +2144,7 @@ static void player_task(void *pvParameters) {
 
   tg0_timer_deinit();
   playerstarted = false;
+  status_led_set_state(STATUS_LED_OFF);
   ESP_LOGI(TAG, "stop player done");
   playerTaskHandle = NULL;
   vTaskDelete(NULL);

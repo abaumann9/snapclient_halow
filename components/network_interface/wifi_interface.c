@@ -21,6 +21,7 @@
 #include "network_interface.h"
 #include "nvs_flash.h"
 #include "sdkconfig.h"
+#include "status_led.h"
 
 #if ENABLE_WIFI_PROVISIONING
 #include "wifi_provisioning.h"
@@ -212,6 +213,18 @@ void wifi_start(void) {
   ESP_ERROR_CHECK(esp_wifi_get_config(WIFI_IF_STA, &wifi_config));
   wifi_config.sta.sort_method = WIFI_CONNECT_AP_BY_SIGNAL;
   ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
+
+  /* If NVS has no SSID stored yet, indicate we're waiting for the user to
+     provision via Improv. Otherwise the existing NVS-persisted creds will
+     auto-connect and the normal NETWORK_WAITING LED state applies. */
+  bool have_creds = wifi_config.sta.ssid[0] != '\0';
+  if (!have_creds) {
+    ESP_LOGI(TAG, "No stored Wi-Fi credentials, awaiting Improv provisioning");
+    status_led_set_state(STATUS_LED_PROVISIONING);
+  } else {
+    ESP_LOGI(TAG, "Using stored Wi-Fi credentials for SSID \"%s\"",
+             (const char *)wifi_config.sta.ssid);
+  }
 
   ESP_ERROR_CHECK(esp_event_handler_register(
       WIFI_EVENT, ESP_EVENT_ANY_ID, (esp_event_handler_t)&event_handler, NULL));

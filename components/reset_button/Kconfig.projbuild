@@ -1,0 +1,31 @@
+menu "Reset Button"
+
+    config RESET_BUTTON_ENABLED
+        bool "Enable factory-reset button"
+        default y if ESP32_S3_XIAO_AUDIO_HAT_BOARD
+        default n
+        help
+            Hold the configured GPIO button to clear persisted Wi-Fi/HaLow
+            credentials and reboot.
+
+    config RESET_BUTTON_GPIO
+        int "Reset button GPIO number"
+        depends on RESET_BUTTON_ENABLED
+        default 11 if ESP32_S3_XIAO_AUDIO_HAT_BOARD
+        default -1
+        help
+            GPIO that the factory-reset button is wired to.
+
+    config RESET_BUTTON_ACTIVE_LOW
+        bool "Button is active low (pull-up to VCC, press shorts to GND)"
+        depends on RESET_BUTTON_ENABLED
+        default y
+
+    config RESET_BUTTON_HOLD_MS
+        int "Long-press hold duration (ms)"
+        depends on RESET_BUTTON_ENABLED
+        default 5000
+        help
+            How long the button must be held before credentials are erased.
+
+endmenu

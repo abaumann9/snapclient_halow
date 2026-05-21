@@ -59,6 +59,8 @@
 #include "snapcast.h"
 #include "snapcast_protocol_parser.h"
 #include "ui_http_server.h"
+#include "reset_button.h"
+#include "status_led.h"
 #if CONFIG_DAC_TAS5805M
 #include "tas5805m_settings.h"
 #endif
@@ -1163,7 +1165,9 @@ static void http_get_task(void *pvParameters) {
     }
 
     // NETWORK setup ends here ( or before getting mac address )
+    status_led_set_state(STATUS_LED_NETWORK_WAITING);
     setup_network(&connection.netif);
+    status_led_set_state(STATUS_LED_SERVER_CONNECTING);
 
     //if (reset_latency_buffer() < 0) {
     //  ESP_LOGE(TAG,
@@ -1252,6 +1256,7 @@ static void http_get_task(void *pvParameters) {
     }
 
     ESP_LOGI(TAG, "netconn sent hello message");
+    status_led_set_state(STATUS_LED_CONNECTED);
 
     free(hello_message_serialized);
     hello_message_serialized = NULL;
@@ -1396,6 +1401,12 @@ void app_main(void) {
                        .intr_type = GPIO_INTR_DISABLE};
   gpio_config(&cfg);
 #endif
+
+#if CONFIG_STATUS_LED_ENABLED
+  status_led_init(CONFIG_STATUS_LED_GPIO);
+#endif
+
+  reset_button_init();
 
   network_if_init();
 

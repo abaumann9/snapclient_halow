@@ -59,6 +59,13 @@ if(CONFIG_AUDIO_BOARD_CUSTOM)
   endif()
 endif()
 
+# ESP32-S3 XIAO Audio HAT uses PCM5102A - include the driver
+if(CONFIG_ESP32_S3_XIAO_AUDIO_HAT_BOARD)
+  message(STATUS "Including PCM5102A driver for ESP32-S3 XIAO Audio HAT")
+  list(APPEND COMPONENT_ADD_INCLUDEDIRS ./pcm5102a/include)
+  list(APPEND COMPONENT_SRCS ./pcm5102a/pcm5102a.c)
+endif()
+
 register_component()
 
 IF (IDF_VER MATCHES "v4.")
