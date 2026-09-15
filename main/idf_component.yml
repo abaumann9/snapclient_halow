@@ -2,11 +2,11 @@
 dependencies:
   espressif/esp-dsp: '*'
   ## Required IDF version
+  ## morsemicro/halow >= 2.11.2-esp32-2 requires IDF >= 5.4.4 (< 6.0).
   idf:
-    version: '>=5.0'
+    version: '>=5.4.4,<6.0'
   # # Put list of dependencies here
   # # For components maintained by Espressif:
   # component: "~1.0.0"
   espressif/mdns: '>=1.2.3'
-  morsemicro/firmware: ^2.10.4-esp32-1
-  morsemicro/halow: ^2.10.4-esp32-1
+  morsemicro/halow: '==2.11.2-esp32-2'

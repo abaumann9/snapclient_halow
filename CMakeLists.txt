@@ -20,16 +20,9 @@ include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 
 project(snapclient)
 
-# Bridge for upstream morsemicro/halow 2.10.4-esp32-1 packaging bug:
-# components/shims/CMakeLists.txt references idf::firmware directly, but
-# the registry firmware component is registered as morsemicro__firmware
-# (target idf::morsemicro__firmware), so idf::firmware never exists.
-if(TARGET __idf_morsemicro__firmware AND NOT TARGET idf::firmware)
-    add_library(idf::firmware ALIAS __idf_morsemicro__firmware)
-endif()
-
-# Registry tarball for morsemicro/halow strips Unix exec bits; restore them so
-# scripts invoked directly from CMake custom_commands (e.g. librarymangler.py) work.
+# Registry archive for morsemicro/halow strips Unix exec bits; restore them so
+# scripts invoked directly from CMake custom_commands (e.g. librarymangler.py and
+# convert-bin-to-mbin.py) work.
 file(GLOB_RECURSE _halow_scripts
     "${CMAKE_CURRENT_SOURCE_DIR}/managed_components/morsemicro__halow/*.py"
     "${CMAKE_CURRENT_SOURCE_DIR}/managed_components/morsemicro__halow/*.sh")
